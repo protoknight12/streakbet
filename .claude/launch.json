@@ -1,0 +1,6 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    { "name": "streakbet", "runtimeExecutable": "npx", "runtimeArgs": ["--yes", "http-server", ".", "-p", "5174", "-c-1"], "port": 5174 }
+  ]
+}

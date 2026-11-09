@@ -1,0 +1,13 @@
+/* StreakBet shell: header tools and footer (everything else comes from style.css) */
+.top .tools { margin-left: auto; display: flex; align-items: center; gap: 6px; }
+.tools .ghost { padding: 6px 12px; border-radius: 999px; background: var(--tint); }
+.menu { position: relative; }
+.menu summary { list-style: none; cursor: pointer; }
+.menu summary::-webkit-details-marker { display: none; }
+.menu-pop { position: absolute; right: 0; top: 110%; z-index: 10; display: grid; gap: 4px; padding: 8px; min-width: 190px; border-radius: 16px; }
+.menu-pop .ghost { text-align: left; border-radius: 10px; }
+.foot { max-width: 1040px; margin: 24px auto 8px; text-align: center; font-size: 13px; }
+@media (max-width: 700px) {
+  .top .brand { display: inline; }
+}
+@media (max-width: 700px) { body { padding-bottom: 96px; } }

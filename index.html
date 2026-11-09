@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="color-scheme" content="only light">
+<meta name="theme-color" content="#e6ece6">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>StreakBet</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=Instrument+Serif:ital@0;1&display=swap">
+<link rel="stylesheet" href="style.css?v=1">
+<link rel="stylesheet" href="shell.css?v=1">
+</head>
+<body>
+<header class="top glass">
+  <span class="brand">StreakBet</span>
+  <span class="cash wallet-in" title="Cash">$0</span>
+  <nav class="tools">
+    <button class="ghost" id="topup" hidden>Free $1,000</button>
+    <button class="ghost" id="soundBtn" aria-label="Toggle sound">🔊</button>
+    <details class="menu">
+      <summary class="ghost" aria-label="Save menu">⋯</summary>
+      <div class="menu-pop glass">
+        <button class="ghost" id="nameBtn">✎ Name</button>
+        <button class="ghost" id="exportBtn">Download my save</button>
+        <button class="ghost" id="importBtn">Load a save file</button>
+        <button class="ghost" id="resetBtn">Start over</button>
+        <input type="file" id="importFile" accept="application/json,.json" hidden>
+      </div>
+    </details>
+  </nav>
+</header>
+<div class="cash wallet-float glass" title="Cash">$0</div>
+
+<main>
+<nav class="seg views" id="views">
+  <button data-view="casino" aria-pressed="true">StreakBet</button>
+  <button data-view="belot" aria-pressed="false">Белот</button>
+  <button data-view="svara" aria-pressed="false">Свара</button>
+</nav>
+<section id="casino" class="view casino-view">
+  <div class="glass panel casino-head">
+    <div>
+      <h2 class="title">StreakBet</h2>
+      <p class="muted">No account, no sign-up. Your cash is saved on this device.</p>
+    </div>
+    <div class="chips" id="chips" aria-label="Bet size"></div>
+  </div>
+  <div class="seg" id="casinoTabs">
+    <button data-c="bj" aria-pressed="true">Blackjack</button>
+    <button data-c="roul" aria-pressed="false">Roulette</button>
+    <button data-c="slots" aria-pressed="false">Slots</button>
+  </div>
+
+  <div class="glass panel felt" data-c="bj">
+    <div class="hand-row"><span class="who-row">Dealer <b class="total" id="bjDealerTotal"></b></span><div class="hand" id="bjDealer"></div></div>
+    <div class="row mid"><p class="table-msg" id="bjMsg">Pick a chip above, then press Deal.</p><span class="bet-spot" id="bjBet"></span></div>
+    <div class="hand-row"><span class="who-row">You <b class="total" id="bjYouTotal"></b></span><div class="hand" id="bjYou"></div></div>
+    <div class="row wrap">
+      <button class="btn" id="bjDeal">Deal</button>
+      <button class="ghost" id="bjHit" disabled>Hit</button>
+      <button class="ghost" id="bjStand" disabled>Stand</button>
+      <button class="ghost" id="bjDouble" disabled>Double</button>
+    </div>
+    <details class="howto">
+      <summary>How to play Blackjack</summary>
+      <ul>
+        <li>Get closer to 21 than the dealer without going over. Number cards count their value, J/Q/K are 10, an Ace is 11 or 1.</li>
+        <li><b>Hit</b> takes a card, <b>Stand</b> stops, <b>Double</b> doubles your bet for exactly one more card.</li>
+        <li>The dealer draws to 17. A win pays 2x your bet, a two-card 21 (blackjack) pays 2.5x, a tie returns your bet.</li>
+      </ul>
+    </details>
+  </div>
+
+  <div class="glass panel felt" data-c="roul" hidden>
+    <div class="wheel-wrap"><svg id="wheel" viewBox="-110 -110 220 220" aria-hidden="true"></svg><i class="pointer"></i><b id="roulResult" class="roul-result"></b></div>
+    <div class="board" id="board"></div>
+    <div class="row wrap">
+      <button class="btn" id="spin">Spin</button>
+      <button class="ghost" id="roulClear">Clear bets</button>
+      <span class="muted" id="roulTotal">No bets</span>
+    </div>
+  </div>
+
+  <div class="glass panel felt" data-c="slots" hidden>
+    <div class="reels" id="reels"></div>
+    <p class="free-info" id="freeInfo" hidden></p>
+    <p class="muted" id="slotMsg">5 reels, 10 lines. Three or more in a row from the left reel pay, wilds help, 3 stars give free spins.</p>
+    <div class="row wrap"><button class="btn" id="pull">Spin</button><button type="button" class="ghost" id="autoGo">Auto spin</button></div>
+    <div class="auto-row">
+      <label>Spins <select class="field" id="autoN"><option>10</option><option selected>25</option><option>50</option><option>100</option><option>500</option><option value="inf">∞</option></select></label>
+      <label><input type="checkbox" id="autoStopWin"> Stop on a win</label>
+      <label><input type="checkbox" id="autoStopBig" checked> Stop on 10x+</label>
+      <label><input type="checkbox" id="autoTurbo"> Turbo</label>
+    </div>
+    <details class="howto">
+      <summary>Paytable (x the line bet: your chip is split over 10 lines)</summary>
+      <div class="pay-table muted" id="payTable"></div>
+      <p class="muted">A line pays when 3, 4 or 5 of the same symbol run from the left reel along it; only its best win counts.
+        Lines: middle, top, bottom, V, ^, two diagonals and three zig-zags. The machine pays back about 96% of what's bet over time.</p>
+    </details>
+  </div>
+
+</section>
+
+<section id="belot" class="view belot-view" hidden>
+  <div class="glass panel">
+    <div class="row end wrap">
+      <h2 class="title">Белот</h2>
+      <button class="btn" id="belotNew">New game vs bots</button>
+    </div>
+    <div class="lobby" id="lobby">
+      <button class="ghost" id="lobbyHost">Host online table</button>
+      <span class="muted">or</span>
+      <input class="field code" id="lobbyCode" maxlength="5" placeholder="CODE" autocapitalize="characters" autocomplete="off" spellcheck="false" aria-label="Table code">
+      <button class="ghost" id="lobbyJoin">Join</button>
+    </div>
+    <div class="room" id="room" hidden>
+      <p>Table <b class="room-code" id="roomCode"></b> <button class="ghost small" id="roomCopy">Copy code</button></p>
+      <ul class="room-seats" id="roomSeats"></ul>
+      <div class="row wrap"><button class="btn" id="roomStart">Start</button><button class="ghost" id="roomLeave">Leave table</button></div>
+    </div>
+    <div class="scores">
+      <div class="team us"><span>Us <small id="usNames">you + Bot Maria</small></span><b id="usScore">0</b><i><em id="usBar"></em></i></div>
+      <div class="team them"><span>Them <small id="themNames">Bot Ivan + Bot Georgi</small></span><b id="themScore">0</b><i><em id="themBar"></em></i></div>
+    </div>
+    <div class="table" id="table">
+      <div class="contract" id="contract" hidden></div>
+      <div class="seat s2"><b class="who"></b><small class="role">partner</small><div class="backs"></div><span class="said"></span></div>
+      <div class="seat s3"><b class="who"></b><small class="role">opponent</small><div class="backs"></div><span class="said"></span></div>
+      <div class="seat s1"><b class="who"></b><small class="role">opponent</small><div class="backs"></div><span class="said"></span></div>
+      <div class="trick" id="trick"></div>
+      <div class="seat s0"><b class="who"></b><span class="said"></span></div>
+    </div>
+    <p class="table-msg" id="belotMsg">Press New game. You and Bot Maria (across the table) are a team.</p>
+    <div class="bids" id="bids"></div>
+    <div class="hand mine" id="myHand"></div>
+    <div class="chat" id="chat" hidden>
+      <ol class="chat-log" id="chatLog" aria-live="polite"></ol>
+      <form class="chat-form" id="chatForm"><input class="field" id="chatText" maxlength="120" placeholder="Say something to the table" autocomplete="off" aria-label="Chat message"><button class="btn">Send</button></form>
+    </div>
+    <details class="howto">
+      <summary>How to play Belot</summary>
+      <ul>
+        <li>Two teams of two; your partner sits across. First team to 151 points wins ($600 prize, $40 for every hand your team takes).</li>
+        <li><b>Bidding:</b> with 5 cards, choose a trump suit, No trumps or All trumps, or pass. Each bid must beat the last; three passes end it. You then get 3 more cards.</li>
+        <li><b>Playing:</b> follow the suit that was led. If you can't, you must trump, unless your partner is already winning. Playable cards are lit up.</li>
+        <li><b>Card strength in trumps:</b> J (20), 9 (14), A (11), 10, K, Q, 8, 7. Other suits: A (11), 10, K, Q, J, 9, 8, 7.</li>
+        <li><b>Bonuses:</b> sequences of 3/4/5+ cards (20/50/100), four of a kind (100-200), K+Q of trumps "Belot" (20), last trick (10), all 8 tricks (90). Declared for you automatically.</li>
+        <li>If the bidding team ends with fewer points than the other team, they get nothing ("вътре") and the defenders take everything.</li>
+      </ul>
+    </details>
+  </div>
+</section>
+
+<section id="svara" class="view cars-view" hidden>
+  <div class="glass panel sv-lobby" id="svLobby">
+    <h2 class="title">Свара</h2>
+    <p class="muted">Three cards each, one round of betting, best hand takes the pot. A tie is a <b>свара</b>: the pot stays, and everyone else can buy into the replay for half of it.</p>
+    <div class="sv-stakes">
+      <label>Ante <input class="field" type="number" id="svAnte" min="1" step="1" value="100" inputmode="numeric"></label>
+      <label>Buy-in <input class="field" type="number" id="svBuyin" min="1" step="1" value="5000" inputmode="numeric"></label>
+    </div>
+    <div class="row wrap"><button type="button" class="btn" id="svCreate">Open a table for friends</button><button type="button" class="ghost" id="svPractice">Practice vs bots</button></div>
+    <form class="row" id="svJoin"><input class="field" id="svCode" maxlength="5" placeholder="Table code" autocomplete="off" aria-label="Table code"><button class="ghost">Join</button></form>
+    <details class="howto">
+      <summary>How to play Свара</summary>
+      <ul>
+        <li>Everyone pays the <b>ante</b> and gets 3 cards. Then, starting left of the dealer: <b>Пас</b> (fold), <b>Плащам</b> (call; <b>Чек</b> when there's nothing to call) or <b>Вдигам</b> (raise).</li>
+        <li>When the bets are level, the hands still in are shown. A hand scores the total of its best suit: A 11, K Q J 10 count 10, 9 8 7 their number.</li>
+        <li>Two aces make 22. Three of a kind make three times the card (three aces 33). Three sevens are the best hand: 34.</li>
+        <li>The <b>7♣ is the шеха</b>: it's wild and adds 11 to whichever suit is best.</li>
+        <li>A tie is a <b>свара</b>: the pot stays and the tied players play again. Anyone else at the table may join the replay by paying half the pot.</li>
+        <li>Table stakes: nobody can raise more than the shortest stack still in can call. Leaving cashes out your chips.</li>
+      </ul>
+    </details>
+  </div>
+
+  <div class="glass panel felt sv-table" id="svTable" hidden>
+    <div class="row end wrap"><h2 class="title" id="svTitle"></h2>
+      <div class="row"><button type="button" class="ghost small" id="svShare">Invite friends</button><button type="button" class="ghost small" id="svLeave">Leave and cash out</button></div></div>
+    <p class="muted" id="svInfo"></p>
+    <div class="sv-seats" id="svSeats"></div>
+    <div class="sv-mid"><span class="sv-pot">Pot <b id="svPot">$0</b></span><p class="table-msg" id="svState"></p></div>
+    <div class="sv-mine"><div class="hand" id="svMine"></div><b class="sv-score" id="svScore"></b></div>
+    <div class="sv-acts" id="svActs"></div>
+    <div class="row" id="svRebuyRow"><input class="field" type="number" id="svRebuyAmt" min="1" step="1" placeholder="More chips ($)" inputmode="numeric" aria-label="More chips"><button type="button" class="ghost" id="svRebuy">Add chips</button></div>
+    <ol class="sv-log" id="svLog"></ol>
+  </div>
+  <p class="acct-msg sv-msg" id="svMsg" role="status"></p>
+</section>
+
+</main>
+<div class="toast glass" id="toast" role="status" aria-live="polite" hidden></div>
+<footer class="foot muted">Play money only. No accounts: your cash is stored in this browser (clearing site data erases it, so use “Download my save”). Online Belot and Свара tables use an anonymous guest login, made the first time you open or join one.</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<script src="config.js"></script>
+<script src="core.js?v=1"></script>
+<script src="belot.js"></script>
+<script src="svara.js"></script>
+<script src="app.js?v=1"></script>
+<script src="online.js?v=1"></script>
+<script src="casino.js?v=1"></script>
+<script src="table.js?v=1"></script>
+<script src="svaratable.js?v=1"></script>
+<script src="nav.js?v=1"></script>
+</body>
+</html>
